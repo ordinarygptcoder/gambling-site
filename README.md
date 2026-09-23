@@ -1,0 +1,1 @@
+This game is purely written by AI, only use for school assignment as a group project. DO NOT COPY OR MAKE USE OF THIS FILE

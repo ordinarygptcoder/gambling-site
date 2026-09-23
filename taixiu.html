@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Vượt Lên Điểm Mười</title>
+    <style>
+        :root {
+            --bg-color: #1a0507;
+            --card-bg: #2b0a0e;
+            --gold: #d4af37;
+            --gold-light: #f3e5ab;
+            --red: #8b0000;
+            --red-bright: #ff2a2a;
+            --text-main: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .home-link {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            background: rgba(0,0,0,0.4);
+            color: var(--gold-light);
+            padding: 6px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid var(--gold);
+            z-index: 999;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border: 2px solid var(--gold);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--gold);
+            margin-bottom: 5px;
+            font-size: 24px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .balance-board {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .balance-board span {
+            color: var(--gold-light);
+            font-weight: bold;
+        }
+
+        .dice-section {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .dice {
+            width: 60px;
+            height: 60px;
+            background: #fff;
+            color: #333;
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border: 2px solid var(--gold);
+        }
+
+        .dice.rolling {
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            20% { transform: translate(-3px, 0px) rotate(-10deg); }
+            40% { transform: translate(1px, -1px) rotate(10deg); }
+            60% { transform: translate(-1px, 2px) rotate(0deg); }
+            80% { transform: translate(3px, 1px) rotate(-5deg); }
+            100% { transform: translate(0px, -2px) rotate(5deg); }
+        }
+
+        .result-text {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            height: 30px;
+            margin-bottom: 15px;
+            color: var(--gold-light);
+        }
+
+        .betting-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .bet-box {
+            background: rgba(139, 0, 0, 0.3);
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bet-box:hover {
+            background: rgba(139, 0, 0, 0.6);
+        }
+
+        .bet-box.selected {
+            background: var(--red);
+            border-color: var(--gold-light);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        .bet-box h3 {
+            margin: 0 0 5px 0;
+            color: var(--gold);
+            font-size: 20px;
+        }
+
+        .bet-box p {
+            margin: 0;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--gold-light);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            background: #111;
+            border: 1px solid var(--gold);
+            color: #fff;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .roll-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--gold), #aa820a);
+            color: #111;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .roll-btn:hover {
+            opacity: 0.9;
+        }
+
+        .roll-btn:disabled {
+            background: #555;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .history-section {
+            margin-top: 20px;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .history-section h4 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: var(--gold);
+            text-align: center;
+        }
+
+        .history-list {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .history-item {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .history-item.tai {
+            background: #ff4d4d;
+            color: white;
+        }
+
+        .history-item.xiu {
+            background: #333;
+            border: 1px solid var(--gold);
+            color: var(--gold-light);
+        }
+    </style>
+</head>
+<body>
+    <!-- Background music. loop keeps it playing round after round. -->
+    <audio id="bg-music" src="wit.mp3" loop preload="auto"></audio>
+    <a class="home-link" href="index.html">&larr; Trang chủ</a>
+
+    <div class="game-container">
+        <h1>Vượt Lên Điểm Mười</h1>
+
+        <div class="balance-board">
+            Số dư: <span id="balance">0</span> VNĐ
+        </div>
+
+        <div class="dice-section">
+            <div class="dice" id="dice1">?</div>
+            <div class="dice" id="dice2">?</div>
+            <div class="dice" id="dice3">?</div>
+        </div>
+
+        <div class="result-text" id="resultText">Hãy chọn cửa và đặt cược!</div>
+
+        <div class="betting-board">
+            <div class="bet-box" id="boxTai" onclick="selectChoice('TAI')">
+                <h3>ĐỒNG BIẾN</h3>
+                <p>Tổng từ 11 - 18</p>
+            </div>
+            <div class="bet-box" id="boxXiu" onclick="selectChoice('XIU')">
+                <h3>NGHỊCH BIẾN</h3>
+                <p>Tổng từ 3 - 10</p>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="betAmount">Số tiền cược (10.000đ – 1.000.000đ):</label>
+            <input type="number" id="betAmount" value="10000" min="10000" max="1000000" step="10000">
+        </div>
+
+        <button class="roll-btn" id="rollBtn" onclick="playGame()">LẮC XÚC XẮC</button>
+
+        <div class="history-section">
+            <h4>Lịch sử (Soi cầu)</h4>
+            <div class="history-list" id="historyList"></div>
+        </div>
+    </div>
+
+    <script src="achievements.js"></script>
+    <script src="wallet.js"></script>
+    <script>
+        // Access gate: Tài Xỉu unlocks once "Humble Beginning" (reach
+        // 100.000đ, normally earned at the restaurant) has been achieved.
+    const bgMusic = document.getElementById('bg-music');
+    bgMusic.volume = 0.3;
+
+    function startMusic() {
+        bgMusic.play()
+            .then(() => {
+                console.log('Nhạc đã được phát');
+            })
+            .catch(error => {
+                console.error('Không thể phát nhạc:', error);
+            });
+
+        document.removeEventListener('click', startMusic);
+    }
+
+    document.addEventListener('click', startMusic);
+        if (!Achievements.isUnlocked('humble_beginning')) {
+            alert('Bạn cần đạt số dư 100.000đ để mở khóa Vượt Lên Điểm Mười! Hãy kiếm tiền ở Quán Cơm Việt Ký trước.');
+            window.location.replace('index.html');
+        } else {
+            Achievements.unlock('lets_go_gambling');
+        }
+    </script>
+    <script>
+
+        // Balance now lives in the shared, site-wide wallet instead of a
+        // local variable, so it carries over between all three games.
+        // Table limits, matching the same 10.000đ–1.000.000đ range used at
+        // The Brass Table, so no single roll can swing the shared wallet
+        // wildly out of proportion to the other games.
+        const MIN_BET = 10000;
+        const MAX_BET = 1000000;
+
+        let balance = Wallet.getBalance();
+        let selectedChoice = null;
+        let history = [];
+
+        document.getElementById('balance').innerText = balance.toLocaleString('vi-VN');
+
+        function selectChoice(choice) {
+            selectedChoice = choice;
+            document.getElementById('boxTai').classList.remove('selected');
+            document.getElementById('boxXiu').classList.remove('selected');
+
+            if (choice === 'TAI') {
+                document.getElementById('boxTai').classList.add('selected');
+            } else {
+                document.getElementById('boxXiu').classList.add('selected');
+            }
+        }
+
+        function playGame() {
+            if (!selectedChoice) {
+                alert("Vui lòng chọn cửa Đồng biến hoặc Nghịch biến trước khi lắc!");
+                return;
+            }
+
+            let betAmount = parseInt(document.getElementById('betAmount').value);
+
+            if (isNaN(betAmount) || betAmount <= 0) {
+                alert("Vui lòng nhập số tiền cược hợp lệ!");
+                return;
+            }
+
+            if (betAmount < MIN_BET) {
+                alert(`Cược tối thiểu là ${MIN_BET.toLocaleString('vi-VN')}đ!`);
+                return;
+            }
+
+            if (betAmount > MAX_BET) {
+                alert(`Cược tối đa là ${MAX_BET.toLocaleString('vi-VN')}đ mỗi ván!`);
+                return;
+            }
+
+            if (betAmount > balance) {
+                alert("Số dư của bạn không đủ để đặt cược mức này!");
+                return;
+            }
+
+            document.getElementById('rollBtn').disabled = true;
+            document.getElementById('resultText').innerText = "Đang lắc...";
+
+            let d1 = document.getElementById('dice1');
+            let d2 = document.getElementById('dice2');
+            let d3 = document.getElementById('dice3');
+
+            d1.classList.add('rolling');
+            d2.classList.add('rolling');
+            d3.classList.add('rolling');
+
+            setTimeout(() => {
+                d1.classList.remove('rolling');
+                d2.classList.remove('rolling');
+                d3.classList.remove('rolling');
+
+                let val1 = Math.floor(Math.random() * 6) + 1;
+                let val2 = Math.floor(Math.random() * 6) + 1;
+                let val3 = Math.floor(Math.random() * 6) + 1;
+
+                d1.innerText = val1;
+                d2.innerText = val2;
+                d3.innerText = val3;
+
+                const sixCount = [val1, val2, val3].filter(v => v === 6).length;
+                if (sixCount >= 2) {
+                    Achievements.unlock('d12');
+                }
+
+                let total = val1 + val2 + val3;
+                let outcome = (total >= 11 && total <= 18) ? 'TAI' : 'XIU';
+
+                let resultString = `Tổng: ${total} (${total >= 11 ? 'Đồng biến' : 'Nghịch biến'}) - `;
+
+                if (selectedChoice === outcome) {
+                    balance += betAmount;
+                    document.getElementById('resultText').innerText = resultString + "BẠN ĐÃ THẮNG!";
+                    document.getElementById('resultText').style.color = "#4cd137";
+                } else {
+                    balance -= betAmount;
+                    document.getElementById('resultText').innerText = resultString + "BẠN ĐÃ THUA!";
+                    document.getElementById('resultText').style.color = "#ff4d4d";
+                }
+
+                document.getElementById('balance').innerText = balance.toLocaleString('vi-VN');
+                Wallet.setBalance(balance); // push the result back to the shared wallet
+
+                history.unshift(outcome);
+                if (history.length > 10) history.pop();
+                updateHistoryUI();
+
+                document.getElementById('rollBtn').disabled = false;
+
+                if (balance <= 0) {
+                    alert("Bạn đã hết tiền trong tài khoản! Trò chơi kết thúc.");
+                    document.getElementById('rollBtn').disabled = true;
+                }
+
+            }, 1000);
+        }
+
+        function updateHistoryUI() {
+            let historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            history.forEach(item => {
+                let div = document.createElement('div');
+                div.className = `history-item ${item.toLowerCase()}`;
+                div.innerText = item === 'TAI' ? 'T' : 'X';
+                historyList.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>

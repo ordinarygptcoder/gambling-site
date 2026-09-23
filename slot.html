@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Máy quay thưởng — Xóa đói giảm nghèo</title>
+<style>
+  /* ===== MÀU SẮC: dùng chung bảng màu với các trò chơi khác trên trang ===== */
+  :root{
+    --bg-color:#1a0507;
+    --card-bg:#2b0a0e;
+    --gold:#d4af37;
+    --gold-light:#f3e5ab;
+    --red:#8b0000;
+    --red-bright:#ff2a2a;
+    --text-main:#f5f5f5;
+    --muted:#b9b0a8;
+    --win:#4cd137;
+  }
+
+  body{
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    background-color:var(--bg-color);
+    color:var(--text-main);
+    margin:0;
+    padding:60px 20px 20px;
+    box-sizing:border-box;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+  }
+  button,select{font-family:inherit}
+
+  .home-link{
+    position:fixed;top:14px;left:14px;
+    background:rgba(0,0,0,0.4);color:var(--gold-light);
+    padding:6px 12px;border-radius:8px;text-decoration:none;
+    font-size:13px;border:1px solid var(--gold);z-index:999;
+  }
+
+  .machine{
+    width:100%;max-width:480px;
+    background:var(--card-bg);
+    border:2px solid var(--gold);
+    border-radius:16px;
+    padding:20px;
+    text-align:center;
+    box-shadow:0 8px 25px rgba(212,175,55,0.2);
+  }
+  h1{
+    margin:0 0 5px;text-align:center;color:var(--gold);
+    font-size:24px;letter-spacing:2px;text-transform:uppercase;
+  }
+  .note{font-size:13px;color:var(--muted);margin:4px 0 16px}
+
+  .stats{display:flex;gap:10px}
+  .balance{
+    flex:1;min-width:0;padding:10px;font-size:14px;
+    background:rgba(0,0,0,0.4);
+    border:1px solid rgba(212,175,55,0.3);
+    border-radius:8px;
+  }
+  .balance b{display:block;font-size:20px;color:var(--gold-light)}
+  #win{color:var(--win)}
+
+  .reels{
+    display:flex;gap:10px;margin:16px 0;padding:12px;
+    background:rgba(0,0,0,0.4);
+    border:1px solid rgba(212,175,55,0.3);
+    border-radius:12px;
+  }
+  .reel{
+    flex:1;aspect-ratio:1;background:#fff;color:#333;
+    border:2px solid var(--gold);border-radius:12px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.5);
+    font-size:58px;
+    font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .reel.spinning{filter:blur(1.5px)}
+
+  /* Hiệu ứng phát sáng khi trúng */
+  @keyframes glow{
+    0%,100%{box-shadow:0 0 6px 2px rgba(212,175,55,.5)}
+    50%{box-shadow:0 0 24px 10px rgba(243,229,171,.95)}
+  }
+  .glow{animation:glow .7s ease-in-out 5}
+  @media (prefers-reduced-motion:reduce){
+    .glow{animation:none;box-shadow:0 0 18px 6px rgba(243,229,171,.9)}
+  }
+
+  #message{min-height:30px;font-size:18px;font-weight:bold;margin-bottom:12px;color:var(--gold-light)}
+  #message.win{color:var(--win)}
+
+  .label{font-size:14px;color:var(--muted);margin-bottom:6px}
+  .bets{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+  .bets button{
+    padding:10px 12px;border:2px solid var(--gold);
+    background:rgba(139,0,0,0.3);color:var(--text-main);
+    border-radius:12px;font-size:15px;cursor:pointer;transition:all .2s;
+  }
+  .bets button:hover{background:rgba(139,0,0,0.6)}
+  .bets button.active{
+    background:var(--red);border-color:var(--gold-light);
+    box-shadow:0 0 15px rgba(212,175,55,0.5);font-weight:bold;
+  }
+
+  #spinBtn{
+    width:100%;padding:14px;font-size:20px;font-weight:bold;
+    color:#1a0507;background:linear-gradient(135deg,var(--gold),#aa820a);
+    border:1px solid var(--gold);border-radius:10px;cursor:pointer;
+  }
+  #spinBtn:hover{opacity:.9}
+  #spinBtn:disabled{opacity:.5;cursor:not-allowed}
+  #spinBtn:focus-visible,.bets button:focus-visible,.small:focus-visible{outline:3px solid #fff;outline-offset:2px}
+
+  .auto{display:flex;gap:8px;justify-content:center;align-items:center;margin-top:10px}
+  .auto select{
+    padding:8px;font-size:14px;color:var(--gold-light);
+    background:rgba(0,0,0,0.4);border:1px solid rgba(212,175,55,0.4);border-radius:8px;
+  }
+  .small{
+    padding:8px 16px;font-size:12.5px;background:none;color:var(--gold-light);
+    border:1px solid var(--gold);border-radius:8px;cursor:pointer;
+  }
+  .small:hover{background:rgba(212,175,55,0.15)}
+  .small.active{background:var(--gold);color:#1a0507;font-weight:bold}
+  .tools{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+
+  details{margin-top:16px;text-align:left;font-size:14px}
+  summary{cursor:pointer;color:var(--gold)}
+  table{width:100%;margin-top:8px;border-collapse:collapse}
+  td{padding:3px 0}
+  td:last-child{text-align:right;color:var(--gold-light)}
+</style>
+</head>
+<body>
+
+  <a class="home-link" href="index.html">&larr; Trang chủ</a>
+
+  <!-- Background music. loop keeps it playing round after round. -->
+  <audio id="bg-music" src="Roland1.mp3" loop preload="auto"></audio>
+
+  <div class="machine">
+    <h1>Máy quay thưởng</h1>
+    <p class="note">Trò chơi giả lập, chỉ dùng tiền ảo.</p>
+
+    <div class="stats">
+      <div class="balance" id="balanceBox">Số dư<b id="balance">0đ</b></div>
+      <div class="balance" id="winBox">Thắng<b id="win">0đ</b></div>
+    </div>
+
+    <div class="reels">
+      <div class="reel">🍒</div>
+      <div class="reel">🍋</div>
+      <div class="reel">🔔</div>
+    </div>
+
+    <div id="message">Chọn mức cược rồi bấm Quay</div>
+
+    <div class="label">Mức cược mỗi lượt</div>
+    <div class="bets" id="bets"></div>
+
+    <button id="spinBtn">Quay</button>
+
+    <div class="auto">
+      <select id="autoCount" aria-label="Số lượt quay tự động">
+        <option value="5">5 lượt</option>
+        <option value="10">10 lượt</option>
+      </select>
+      <button class="small" id="autoBtn">Quay tự động</button>
+    </div>
+
+    <div class="tools">
+      <button class="small" id="musicBtn">Nhạc nền: Tắt</button>
+      <button class="small" id="sfxBtn">Hiệu ứng: Bật</button>
+    </div>
+
+    <details>
+      <summary>Cách tính thưởng</summary>
+      <table id="payTable"></table>
+      <p class="note" id="payNote" style="margin:8px 0 0"></p>
+    </details>
+  </div>
+
+<script src="achievements.js"></script>
+<script src="wallet.js"></script>
+<script>
+  // Access gate: Máy quay thưởng mở khóa cùng lúc với Vượt Lên Điểm Mười,
+  // khi đã đạt "Sự khởi đầu khiêm tốn" (số dư 100.000đ).
+  if (!Achievements.isUnlocked('humble_beginning')) {
+    alert('Bạn cần đạt số dư 100.000đ để mở khóa Máy quay thưởng! Hãy kiếm tiền ở Quán Cơm Việt Ký trước.');
+    window.location.replace('index.html');
+  } else {
+    Achievements.unlock('lets_go_gambling');
+  }
+</script>
+<script>
+  // ===== CÀI ĐẶT: bạn có thể sửa các số này =====
+  // Tiền không còn nằm riêng trong trang này: số dư đọc/ghi thẳng vào ví chung (wallet.js).
+  const BET_OPTIONS = [10000, 20000, 50000, 100000];    // các mức cược
+  const SYMBOLS = [                                     // hình + tiền thắng (ở mức cược cơ bản) khi ra 3 hình giống nhau
+    { icon: "🍒", prize: 20000 },
+    { icon: "🍋", prize: 40000 },
+    { icon: "🔔", prize: 80000 },
+    { icon: "⭐", prize: 200000 },
+    { icon: "💎", prize: 300000 },
+    { icon: "7️⃣", prize: 500000 }
+  ];
+
+  const BASE_BET = 10000;   // mức cược cơ bản mà bảng tiền thắng tính theo (cược cao hơn thì nhân lên)
+
+  const PAIR_REFUND = 0.6;   // ra 2 hình giống nhau thì hoàn lại 60% tiền cược (0.6 = 60%)
+
+  // ===== TỈ LỆ: TRIPLE_CHANCE là xác suất "ép" ra 3 hình giống nhau (0.05 = 5%) =====
+  // Muốn dễ trúng hơn thì tăng số này, muốn về như cũ thì đặt 0
+  const TRIPLE_CHANCE = 0.05;
+  const TRIPLE_WEIGHTS = [40, 30, 15, 8, 5, 2];   // độ hay ra của từng hình (🍒 hay nhất, 7 hiếm nhất)
+
+  // ===== ÂM THANH =====
+  // Nhạc nền: Roland1.mp3 (thẻ <audio id="bg-music"> ở trên), tự phát khi bấm lần đầu như các trang khác.
+  const bgMusic = document.getElementById("bg-music");
+  bgMusic.volume = 0.3;
+
+  // Tiếng thắng/thua (tùy chọn): đặt file vào thư mục "sounds" cạnh file này, chưa có thì tự bỏ qua.
+  const sounds = {
+    coin: new Audio("sounds/coin.mp3"),   // tiếng đồng xu khi trúng 3 hình giống nhau
+    lose: new Audio("sounds/lose.mp3")    // tiếng thua
+  };
+
+  let sfxOn = true, musicOn = false, musicTouched = false;
+
+  function playSound(name) {
+    if (!sfxOn) return;
+    try {
+      sounds[name].currentTime = 0;
+      sounds[name].play().catch(() => {});   // nếu chưa có file thì bỏ qua, không lỗi
+    } catch (e) {}
+  }
+
+  const musicBtn = document.getElementById("musicBtn");
+  function setMusic(on) {
+    musicOn = on;
+    if (on) {
+      bgMusic.play().catch(() => { musicOn = false; updateMusicBtn(); });
+    } else {
+      bgMusic.pause();
+    }
+    updateMusicBtn();
+  }
+  function updateMusicBtn() {
+    musicBtn.textContent = "Nhạc nền: " + (musicOn ? "Bật" : "Tắt");
+  }
+
+  // Giống các trang khác: nhạc tự chạy ở lần bấm chuột đầu tiên
+  function startMusicOnce() {
+    document.removeEventListener("click", startMusicOnce);
+    if (!musicTouched) setMusic(true);
+  }
+  document.addEventListener("click", startMusicOnce);
+
+  musicBtn.onclick = function () {
+    musicTouched = true;
+    setMusic(!musicOn);
+  };
+
+  // ===== TIẾNG QUAY KIỂU XÍCH (tạo bằng code, không cần file) =====
+  let audioCtx;
+  function getCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
+
+  // Một tiếng "tách" ngắn. freq: độ cao, vol: độ to, dur: độ dài (giây)
+  function tick(freq, vol, dur) {
+    if (!sfxOn) return;
+    try {
+      const ctx = getCtx(), t = ctx.currentTime;
+      const buf = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * dur), ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const filter = ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.value = freq;
+      filter.Q.value = 4;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(vol, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      src.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      src.start(t);
+    } catch (e) {}
+  }
+
+  // Tiếng "tách tách tách" nhanh, càng gần lúc dừng càng chậm lại
+  let tickTimer;
+  function startSpinSound() {
+    stopSpinSound();
+    const start = performance.now();
+    const total = 2200;   // khớp với thời gian quay của 3 ô
+    (function loop() {
+      const p = (performance.now() - start) / total;
+      if (p >= 1) return;
+      tick(2600 + Math.random() * 800, 1.2, 0.03);
+      tickTimer = setTimeout(loop, 55 + p * p * 120);
+    })();
+  }
+  function stopSpinSound() {
+    clearTimeout(tickTimer);
+  }
+
+  // ===== BIẾN CỦA TRÒ CHƠI =====
+  let bet = BET_OPTIONS[0];
+  let spinning = false;
+
+  const reels = document.querySelectorAll(".reel");
+  const balanceEl = document.getElementById("balance");
+  const winEl = document.getElementById("win");
+  const messageEl = document.getElementById("message");
+  const spinBtn = document.getElementById("spinBtn");
+  const betsEl = document.getElementById("bets");
+
+  // Đổi số thành tiền VNĐ theo đúng định dạng của ví chung, ví dụ 1000000 -> "1.000.000đ"
+  const vnd = Wallet.formatVnd;
+
+  function showMessage(text, isWin) {
+    messageEl.textContent = text;
+    messageEl.className = isWin ? "win" : "";
+  }
+
+  // Số dư luôn lấy từ ví chung; tự cập nhật mỗi khi ví đổi (kể cả từ tab khác)
+  function updateBalance() {
+    balanceEl.textContent = vnd(Wallet.getBalance());
+  }
+  window.addEventListener("wallet:changed", updateBalance);
+
+  // Tạo các nút chọn mức cược
+  BET_OPTIONS.forEach(function (amount) {
+    const b = document.createElement("button");
+    b.textContent = vnd(amount);
+    b.onclick = function () {
+      if (spinning) return;
+      bet = amount;
+      document.querySelectorAll(".bets button").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+    };
+    if (amount === bet) b.classList.add("active");
+    betsEl.appendChild(b);
+  });
+
+  function randomIndex() {
+    return Math.floor(Math.random() * SYMBOLS.length);
+  }
+
+  // Chọn kết quả của lượt quay
+  function pickResult() {
+    if (Math.random() < TRIPLE_CHANCE) {
+      let roll = Math.random() * 100, sum = 0, idx = 0;
+      for (let i = 0; i < TRIPLE_WEIGHTS.length; i++) {
+        sum += TRIPLE_WEIGHTS[i];
+        if (roll < sum) { idx = i; break; }
+      }
+      return [idx, idx, idx];
+    }
+    return [randomIndex(), randomIndex(), randomIndex()];
+  }
+
+  // Bật/tắt hiệu ứng phát sáng ở 3 ô quay và khung số dư
+  const balanceBox = document.getElementById("balanceBox");
+  const winBox = document.getElementById("winBox");
+  let glowTimer;
+  function glowOn() {
+    glowOff();
+    reels.forEach(r => r.classList.add("glow"));
+    balanceBox.classList.add("glow");
+    winBox.classList.add("glow");
+    glowTimer = setTimeout(glowOff, 3600);
+  }
+  function glowOff() {
+    clearTimeout(glowTimer);
+    reels.forEach(r => r.classList.remove("glow"));
+    balanceBox.classList.remove("glow");
+    winBox.classList.remove("glow");
+  }
+
+  // ===== QUAY =====
+  function spin() {
+    if (spinning) return;
+    if (Wallet.getBalance() < bet) {
+      showMessage("Không đủ tiền. Hãy chọn mức cược thấp hơn hoặc kiếm thêm ở Quán Cơm Việt Ký.");
+      return;
+    }
+    spinning = true;
+    spinBtn.disabled = true;
+    Wallet.addBalance(-bet);   // trừ tiền cược thẳng từ ví chung
+    glowOff();
+    winEl.textContent = vnd(0);
+    showMessage("Đang quay...");
+    startSpinSound();
+
+    const result = pickResult();
+
+    reels.forEach(function (reel, i) {
+      reel.classList.add("spinning");
+      const timer = setInterval(function () {
+        reel.textContent = SYMBOLS[randomIndex()].icon;   // đổi hình liên tục cho có cảm giác quay
+      }, 80);
+      // Mỗi ô dừng lại lần lượt: ô 1, rồi ô 2, rồi ô 3
+      setTimeout(function () {
+        clearInterval(timer);
+        reel.textContent = SYMBOLS[result[i]].icon;
+        reel.classList.remove("spinning");
+        tick(700, 2.2, 0.14);   // tiếng "cạch" khi ô dừng
+        if (i === reels.length - 1) finishSpin(result);
+      }, 1000 + i * 600);
+    });
+  }
+
+  function finishSpin(r) {
+    stopSpinSound();
+    let prize = 0;
+    if (r[0] === r[1] && r[1] === r[2]) {
+      prize = SYMBOLS[r[0]].prize * (bet / BASE_BET);                       // 3 hình giống nhau
+    } else if (r[0] === r[1] || r[1] === r[2] || r[0] === r[2]) {
+      prize = Math.round(bet * PAIR_REFUND);   // 2 hình giống nhau: hoàn lại một phần tiền cược
+    }
+    if (prize > 0) Wallet.addBalance(prize);   // cộng tiền thắng thẳng vào ví chung
+    winEl.textContent = vnd(prize > bet ? prize : 0);   // ô Thắng chỉ hiện khi thắng thật
+
+    if (prize > bet) {
+      showMessage("Trúng 3 hình giống nhau! Nhận " + vnd(prize), true);
+      playSound("coin");
+      glowOn();
+    } else if (prize > 0) {
+      showMessage("2 hình giống nhau, hoàn lại " + vnd(prize));
+    } else {
+      showMessage("Chưa trúng. Thử lại nhé!");
+      playSound("lose");
+    }
+    spinning = false;
+    spinBtn.disabled = autoOn;
+    if (autoOn) {
+      if (autoLeft > 0) autoTimer = setTimeout(autoNext, prize > bet ? 2200 : 1200);   // thắng thì chờ lâu hơn để xem hiệu ứng
+      else stopAuto();   // hết lượt
+    }
+  }
+
+  // ===== QUAY TỰ ĐỘNG =====
+  const autoBtn = document.getElementById("autoBtn");
+  const autoCountEl = document.getElementById("autoCount");
+  let autoOn = false;   // đang bật quay tự động?
+  let autoLeft = 0;     // số lượt tự động còn lại
+  let autoTimer;
+
+  function updateAutoUI() {
+    autoBtn.textContent = autoOn ? "Dừng (còn " + autoLeft + " lượt)" : "Quay tự động";
+    autoBtn.classList.toggle("active", autoOn);
+    autoCountEl.disabled = autoOn;
+  }
+
+  function stopAuto(text) {
+    autoOn = false;
+    autoLeft = 0;
+    clearTimeout(autoTimer);
+    spinBtn.disabled = spinning;
+    updateAutoUI();
+    if (text && !spinning) showMessage(text);
+  }
+
+  function autoNext() {
+    if (!autoOn) return;
+    if (Wallet.getBalance() < bet) { stopAuto("Không đủ tiền, đã dừng quay tự động"); return; }
+    autoLeft--;
+    updateAutoUI();
+    spin();
+  }
+
+  autoBtn.onclick = function () {
+    if (autoOn) { stopAuto("Đã dừng quay tự động"); return; }   // đang chạy thì bấm để dừng
+    if (spinning) return;
+    autoOn = true;
+    autoLeft = parseInt(autoCountEl.value, 10);
+    autoNext();
+  };
+
+  // ===== CÁC NÚT =====
+  spinBtn.onclick = spin;
+
+  document.getElementById("sfxBtn").onclick = function () {
+    sfxOn = !sfxOn;
+    if (!sfxOn) stopSpinSound();
+    this.textContent = "Hiệu ứng: " + (sfxOn ? "Bật" : "Tắt");
+  };
+
+  // Tạo bảng tiền thắng từ danh sách SYMBOLS
+  let rows = "";
+  SYMBOLS.slice().reverse().forEach(function (s) {
+    rows += "<tr><td>3 hình " + s.icon + " giống nhau</td><td>+" + vnd(s.prize) + "</td></tr>";
+  });
+  rows += "<tr><td>2 hình giống nhau</td><td>Hoàn lại " + Math.round(PAIR_REFUND * 100) + "% tiền cược</td></tr>";
+  document.getElementById("payTable").innerHTML = rows;
+  document.getElementById("payNote").textContent =
+    "Tiền thắng tính ở mức cược " + vnd(BASE_BET) + ". Cược cao hơn thì nhân lên theo.";
+
+  updateBalance();
+</script>
+</body>
+</html>

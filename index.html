@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Xóa đói giảm nghèo — Sảnh Chính</title>
+<style>
+    :root {
+        --bg: #1a0507;
+        --card-bg: #2b0a0e;
+        --card-bg-2: #230809;
+        --gold: #d4af37;
+        --gold-light: #f3e5ab;
+        --text-main: #f5f5f5;
+        --muted: #b9b0a8;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-main);
+        background: radial-gradient(ellipse at 50% 0%, #3a0f14, var(--bg) 60%);
+    }
+
+    a { color: inherit; }
+
+    .wrap {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* ---------- Top nav ---------- */
+    .topnav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(15, 4, 5, 0.85);
+        backdrop-filter: blur(6px);
+        border-bottom: 1px solid rgba(212,175,55,0.35);
+    }
+
+    .topnav .wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        flex-wrap: wrap;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        color: var(--gold);
+        text-transform: uppercase;
+        font-size: 16px;
+        text-decoration: none;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 18px;
+        font-size: 13px;
+        color: var(--muted);
+    }
+    .nav-links a { text-decoration: none; }
+    .nav-links a:hover { color: var(--gold-light); }
+
+    .nav-wallet {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(0,0,0,0.4);
+        border: 1px solid rgba(212,175,55,0.4);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 13px;
+    }
+    .nav-wallet .label { color: var(--muted); }
+    .nav-wallet .amount { color: var(--gold-light); font-weight: 800; }
+
+    /* ---------- Hero ---------- */
+    .hero {
+        text-align: center;
+        padding: 56px 20px 36px;
+    }
+
+    .hero h1 {
+        color: var(--gold);
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        font-size: clamp(28px, 5.5vw, 44px);
+        margin: 0 0 12px;
+    }
+
+    .hero p {
+        color: var(--muted);
+        max-width: 560px;
+        margin: 0 auto;
+        font-size: 15px;
+        line-height: 1.7;
+    }
+
+    .hero .cta-row {
+        margin-top: 24px;
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        display: inline-block;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 13px;
+        padding: 11px 22px;
+        border-radius: 10px;
+        cursor: pointer;
+        border: 1px solid var(--gold);
+    }
+    .btn-solid {
+        background: linear-gradient(135deg, var(--gold), #aa820a);
+        color: #1a0507;
+    }
+    .btn-outline {
+        background: transparent;
+        color: var(--gold-light);
+    }
+    .btn:hover { opacity: 0.9; }
+
+    /* ---------- Section shell ---------- */
+    section { padding: 40px 0; }
+    .section-head {
+        text-align: center;
+        max-width: 620px;
+        margin: 0 auto 28px;
+    }
+    .section-head .eyebrow {
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--gold);
+        font-weight: 700;
+    }
+    .section-head h2 {
+        margin: 6px 0 8px;
+        font-size: 22px;
+        color: var(--text-main);
+    }
+    .section-head p {
+        color: var(--muted);
+        font-size: 13.5px;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* ---------- Wallet stats ---------- */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+    }
+
+    .stat-card {
+        background: rgba(0,0,0,0.35);
+        border: 1px solid rgba(212,175,55,0.35);
+        border-radius: 14px;
+        padding: 18px;
+        text-align: center;
+    }
+    .stat-card .stat-label {
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .stat-card .stat-value {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--gold-light);
+        margin: 6px 0 0;
+    }
+
+    .wallet-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    .wallet-actions button {
+        background: none;
+        border: 1px solid var(--gold);
+        color: var(--gold-light);
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 12.5px;
+        cursor: pointer;
+    }
+    .wallet-actions button:hover { background: rgba(212,175,55,0.15); }
+
+    /* ---------- Sectors (working vs gambling) ---------- */
+    .sector {
+        border-radius: 20px;
+        padding: 22px;
+        margin-bottom: 26px;
+        border: 1px solid;
+    }
+
+    .sector-work {
+        background: linear-gradient(160deg, rgba(20,60,45,0.35), rgba(0,0,0,0.25));
+        border-color: rgba(70,180,120,0.4);
+    }
+
+    .sector-gamble {
+        background: linear-gradient(160deg, rgba(80,10,15,0.35), rgba(0,0,0,0.25));
+        border-color: rgba(212,175,55,0.4);
+    }
+
+    .sector-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .sector-icon {
+        font-size: 30px;
+        flex-shrink: 0;
+    }
+
+    .sector-head h3 {
+        margin: 0 0 3px;
+        font-size: 18px;
+        letter-spacing: 0.5px;
+    }
+
+    .sector-work .sector-head h3 { color: #7fe3ae; }
+    .sector-gamble .sector-head h3 { color: var(--gold); }
+
+    .sector-head p {
+        margin: 0;
+        font-size: 12.5px;
+        color: var(--muted);
+    }
+
+    /* ---------- Games ---------- */
+    .games-list {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .game-row {
+        display: grid;
+        grid-template-columns: 90px 1fr auto;
+        align-items: center;
+        gap: 20px;
+        background: linear-gradient(135deg, var(--card-bg), var(--card-bg-2));
+        border: 2px solid var(--gold);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 8px 25px rgba(212,175,55,0.12);
+    }
+
+    .game-row .icon {
+        font-size: 42px;
+        text-align: center;
+    }
+
+    .game-row h3 {
+        color: var(--gold);
+        font-size: 18px;
+        margin: 0 0 6px;
+    }
+
+    .game-row .desc {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 0 0 10px;
+        line-height: 1.6;
+    }
+
+    .game-row .features {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .game-row .features li {
+        font-size: 11px;
+        color: var(--gold-light);
+        background: rgba(212,175,55,0.12);
+        border: 1px solid rgba(212,175,55,0.35);
+        padding: 3px 10px;
+        border-radius: 999px;
+    }
+
+    .game-row .play-col {
+        text-align: center;
+    }
+
+    .game-row .tag {
+        display: block;
+        font-size: 10.5px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 620px) {
+        .game-row {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+        .game-row .features { justify-content: center; }
+    }
+
+    /* ---------- How it works ---------- */
+    .steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 18px;
+    }
+    .step-card {
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(212,175,55,0.25);
+        border-radius: 14px;
+        padding: 18px;
+    }
+    .step-card .step-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--gold);
+        color: #1a0507;
+        font-weight: 800;
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+    .step-card h4 {
+        margin: 0 0 6px;
+        font-size: 14.5px;
+        color: var(--gold-light);
+    }
+    .step-card p {
+        margin: 0;
+        font-size: 12.5px;
+        color: var(--muted);
+        line-height: 1.6;
+    }
+
+    /* ---------- Locked game cards ---------- */
+    .game-row.locked {
+        opacity: 0.55;
+        filter: grayscale(0.6);
+    }
+    .game-row.locked .btn {
+        pointer-events: none;
+        background: #444;
+        color: #999;
+        border-color: #555;
+    }
+    .lock-note {
+        display: block;
+        font-size: 10.5px;
+        color: #e0b3b3;
+        margin-top: 8px;
+        max-width: 160px;
+    }
+
+    /* ---------- Achievements ---------- */
+    .ach-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+    }
+    .ach-card {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        background: rgba(0,0,0,0.32);
+        border: 1px solid rgba(212,175,55,0.25);
+        border-radius: 14px;
+        padding: 14px;
+    }
+    .ach-card.unlocked {
+        border-color: var(--gold);
+        background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(0,0,0,0.3));
+    }
+    .ach-card .ach-icon {
+        font-size: 26px;
+        width: 34px;
+        text-align: center;
+        flex-shrink: 0;
+        filter: grayscale(1);
+        opacity: 0.5;
+    }
+    .ach-card.unlocked .ach-icon {
+        filter: none;
+        opacity: 1;
+    }
+    .ach-card h4 {
+        margin: 0 0 3px;
+        font-size: 13.5px;
+        color: var(--muted);
+    }
+    .ach-card.unlocked h4 {
+        color: var(--gold-light);
+    }
+    .ach-card p {
+        margin: 0;
+        font-size: 11.5px;
+        color: #877d75;
+        line-height: 1.5;
+    }
+    .ach-card.unlocked p {
+        color: #ccc;
+    }
+    .ach-status {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 4px;
+        display: inline-block;
+    }
+    .ach-card.unlocked .ach-status { color: #7fe3ae; }
+    .ach-card:not(.unlocked) .ach-status { color: #776e66; }
+
+    /* ---------- Footer ---------- */
+    footer {
+        text-align: center;
+        padding: 30px 20px 50px;
+        font-size: 11.5px;
+        color: #8a8078;
+        line-height: 1.7;
+        border-top: 1px solid rgba(212,175,55,0.2);
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+    <!-- Background music. loop keeps it playing round after round. -->
+    <audio id="bg-music" src="shrimphony.mp3" loop preload="auto"></audio>
+<div class="topnav">
+    <div class="wrap">
+        <a class="brand" href="#top">💲 Xóa đói giảm nghèo</a>
+        <div class="nav-links">
+            <a href="#games">Trò chơi</a>
+            <a href="#wallet">Ví của bạn</a>
+            <a href="#achievements">Thành tựu</a>
+        </div>
+        <div class="nav-wallet">
+            <span class="label">Số dư:</span>
+            <span class="amount" id="nav-wallet-amount">10000đ</span>
+        </div>
+    </div>
+</div>
+
+<div id="top" class="hero">
+    <h1>Xóa đói giảm nghèo</h1>
+    <p>Một sảnh chơi, hai khu vực — <strong>Kiếm Tiền</strong> (quán cơm) và <strong>Đốt cháy đam mê</strong>
+       (Vượt Lên Điểm Mười, Máy quay thưởng, Thợ đụng, Roulette, Đũa sắt hoàng gia) — tất cả dùng chung một ví VNĐ ảo duy nhất.</p>
+    <div class="cta-row">
+        <a class="btn btn-solid" href="#games">Xem trò chơi</a>
+        <a class="btn btn-outline" href="#wallet">Kiểm tra số dư</a>
+    </div>
+</div>
+
+<section id="wallet">
+    <div class="wrap">
+        <div class="section-head">
+            <div class="eyebrow">Ví chung</div>
+            <h2>Số dư VNĐ ảo của bạn</h2>
+            <p>Bắt đầu từ 10000đ. Số dư được lưu trên trình duyệt và dùng chung cho cả sáu trò chơi —
+               kiếm tiền ở quán cơm để mở khóa khu Đốt cháy đam mê bên dưới.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Số dư hiện tại</div>
+                <div class="stat-value" id="wallet-amount">10000đ</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Loại tiền tệ</div>
+                <div class="stat-value">VNĐ (ảo)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Số trò chơi</div>
+                <div class="stat-value">6</div>
+            </div>
+        </div>
+
+        <div class="wallet-actions">
+            <button id="reset-wallet-btn">Chơi lại từ đầu (xóa toàn bộ tiến trình)</button>
+        </div>
+    </div>
+</section>
+
+<section id="games">
+    <div class="wrap">
+        <div class="section-head">
+            <div class="eyebrow">Sảnh chính</div>
+            <h2>Chọn khu vực để bắt đầu</h2>
+            <p>Một khu vực để <strong>kiếm tiền</strong> chắc tay bằng công sức, một khu vực để <strong>thử vận may</strong> —
+               cả hai đều dùng chung một ví.</p>
+        </div>
+
+        <!-- ===== SECTOR 1: WORKING ===== -->
+        <div class="sector sector-work">
+            <div class="sector-head">
+                <span class="sector-icon">💼</span>
+                <div>
+                    <h3>Khu Kiếm Tiền</h3>
+                    <p>Không may rủi — thu nhập đến từ công sức và kỹ năng quản lý.</p>
+                </div>
+            </div>
+
+            <div class="games-list">
+                <div class="game-row">
+                    <div class="icon">🍱</div>
+                    <div>
+                        <h3>Quán Cơm Việt Ký</h3>
+                        <p class="desc">Quản lý quán cơm trưa: gắp đúng món theo đơn, phục vụ đúng thứ tự khách và thu tiền lời mỗi ngày.</p>
+                        <ul class="features">
+                            <li>Nâng cấp quán</li>
+                            <li>Ca ngày / ca đêm</li>
+                            <li>Không cần may rủi</li>
+                        </ul>
+                    </div>
+                    <div class="play-col">
+                        <span class="tag">Mô phỏng kinh doanh</span>
+                        <a class="btn btn-solid" href="sell.html">Chơi ngay</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTOR 2: GAMBLING ===== -->
+        <div class="sector sector-gamble">
+            <div class="sector-head">
+                <span class="sector-icon">🔥</span>
+                <div>
+                    <h3>Khu Đốt cháy đam mê</h3>
+                    <p>Đặt cược và thử vận may — tất cả đều trừ/cộng trực tiếp vào cùng một ví.</p>
+                </div>
+            </div>
+
+            <div class="games-list">
+
+                <div class="game-row" id="gr-taixiu" data-requires="humble_beginning">
+                    <div class="icon">🎲</div>
+                    <div>
+                        <h3>Vượt Lên Điểm Mười</h3>
+                        <p class="desc">Chọn cửa Đồng biến hay Nghịch biến, lắc ba xúc xắc và nhân đôi tiền cược nếu đoán đúng tổng điểm.</p>
+                        <ul class="features">
+                            <li>Đặt cược nhanh</li>
+                            <li>Lịch sử soi cầu</li>
+                            <li>Giới hạn bàn 10K–1M</li>
+                        </ul>
+                    </div>
+                    <div class="play-col">
+                        <span class="tag">Đốt cháy đam mê</span>
+                        <a class="btn btn-solid" href="taixiu.html">Chơi ngay</a>
+                        <span class="lock-note">🔒 Cần đạt số dư 100.000đ</span>
+                    </div>
+                </div>
+
+                <div class="game-row" id="gr-slot" data-requires="humble_beginning">
+                    <div class="icon">🎰</div>
+                    <div>
+                        <h3>Máy quay thưởng</h3>
+                        <p class="desc">Máy xèng ba ô: ra ba hình giống nhau để ăn thưởng lớn, hai hình giống nhau hoàn lại một phần tiền cược.</p>
+                        <ul class="features">
+                            <li>Quay tự động</li>
+                            <li>Nhạc nền</li>
+                            <li>Cược 10K–100K</li>
+                        </ul>
+                    </div>
+                    <div class="play-col">
+                        <span class="tag">Đốt cháy đam mê</span>
+                        <a class="btn btn-solid" href="slot.html">Chơi ngay</a>
+                        <span class="lock-note">🔒 Cần đạt số dư 100.000đ</span>
+                    </div>
+                </div>
+
+                <div class="game-row" id="gr-blackjack" data-requires="millionaire">
+                    <div class="icon">🃏</div>
+                    <div>
+                        <h3>Bàn thợ đụng</h3>
+                        <p class="desc">Blackjack cổ điển đấu với dealer bot — dealer dừng ở 17, Blackjack ăn 3 trên 2.</p>
+                        <ul class="features">
+                            <li>Gấp đôi cược (Double down)</li>
+                            <li>Nhạc nền sòng bài</li>
+                            <li>Giới hạn bàn 10K–1M</li>
+                        </ul>
+                    </div>
+                    <div class="play-col">
+                        <span class="tag">Đốt cháy đam mê</span>
+                        <a class="btn btn-solid" href="blackjack.html">Chơi ngay</a>
+                        <span class="lock-note">🔒 Cần đạt số dư 1.000.000đ</span>
+                    </div>
+                </div>
+
+                <div class="game-row" id="gr-ch" data-requires="millionaire">
+                    <div class="icon">♠️</div>
+                    <div>
+                        <h3>Đũa sắt hoàng gia</h3>
+                        <p class="desc">Texas Hold'em heads-up với một dealer. Đặt cược bằng chip, giới hạn 1.000.000đ mỗi vòng, số dư lấy từ ví VNĐ chung.</p>
+                        <ul class="features">
+                            <li>Một dealer</li>
+                            <li>Chọn chip, không nhập số</li>
+                            <li>Giới hạn vòng 1.000.000đ</li>
+                        </ul>
+                    </div>
+                    <div class="play-col">
+                        <span class="tag">Đốt cháy đam mê</span>
+                        <a class="btn btn-solid" href="poker.html">Chơi ngay</a>
+                        <span class="lock-note">🔒 Cần đạt số dư 1.000.000đ</span>
+                    </div>
+                </div>
+
+                <div class="game-row" id="gr-roulette" data-requires="millionaire">
+                    <div class="icon">🌎</div>
+                    <div>
+                        <h3>Vòng quanh Châu Âu</h3>
+                        <p class="desc">Đặt cược lên số, màu, chẵn/lẻ trên bàn roulette châu Âu (single-zero) và quay bánh xe.</p>
+                        <ul class="features">
+                            <li>Cược trong & ngoài bàn</li>
+                            <li>Trả thưởng tới 35:1</li>
+                            <li>Bánh xe & bi mô phỏng thật</li>
+                        </ul>
+                    </div>
+                    <div class="play-col">
+                        <span class="tag">Đốt cháy đam mê</span>
+                        <a class="btn btn-solid" href="roulette.html">Chơi ngay</a>
+                        <span class="lock-note">🔒 Cần đạt số dư 1.000.000đ</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<section id="achievements">
+    <div class="wrap">
+        <div class="section-head">
+            <div class="eyebrow">Thành tựu</div>
+            <h2>Cột mốc trong Xóa đói giảm nghèo</h2>
+            <p>Hai trong số này cũng là chìa khóa mở khu Đốt cháy đam mê — kiếm tiền ở quán cơm để đạt được chúng.</p>
+        </div>
+        <div class="ach-grid" id="ach-grid"></div>
+    </div>
+</section>
+
+<footer>
+    Toàn bộ số tiền VNĐ trên trang này là tiền ảo trong trò chơi — chỉ để giải trí,<br>
+    không có giá trị quy đổi thành tiền thật và không thể nạp/rút bằng tiền thật.
+</footer>
+
+<script src="achievements.js"></script>
+<script src="wallet.js"></script>
+<script>
+    const bgMusic = document.getElementById('bg-music');
+
+    function startMusic() {
+        bgMusic.play()
+            .then(() => {
+                console.log('Nhạc đã được phát');
+            })
+            .catch(error => {
+                console.error('Không thể phát nhạc:', error);
+            });
+
+        document.removeEventListener('click', startMusic);
+    }
+
+    document.addEventListener('click', startMusic);
+        const amountEl = document.getElementById('wallet-amount');
+        const navAmountEl = document.getElementById('nav-wallet-amount');
+
+    function refreshDisplay() {
+        const formatted = Wallet.formatVnd(Wallet.getBalance());
+        amountEl.textContent = formatted;
+        navAmountEl.textContent = formatted;
+    }
+
+    // ----- Lock/unlock the gambling cards based on achievements -----
+    function refreshLocks() {
+        document.querySelectorAll('.game-row[data-requires]').forEach(row => {
+            const req = row.dataset.requires;
+            const unlocked = Achievements.isUnlocked(req);
+            row.classList.toggle('locked', !unlocked);
+            const note = row.querySelector('.lock-note');
+            if (note) note.style.display = unlocked ? 'none' : 'block';
+        });
+    }
+
+    // ----- Render the achievements grid -----
+    function renderAchievements() {
+        const grid = document.getElementById('ach-grid');
+        grid.innerHTML = '';
+        Achievements.all().forEach(a => {
+            const card = document.createElement('div');
+            card.className = 'ach-card' + (a.unlocked ? ' unlocked' : '');
+            card.innerHTML =
+                `<div class="ach-icon">${a.icon}</div>` +
+                `<div>
+                    <h4>${a.title}</h4>
+                    <p>${a.desc}</p>
+                    <span class="ach-status">${a.unlocked ? '✔ Đã đạt' : 'Chưa đạt'}</span>
+                 </div>`;
+            grid.appendChild(card);
+        });
+    }
+
+    document.getElementById('reset-wallet-btn').addEventListener('click', () => {
+        if (confirm('Xóa toàn bộ tiến trình: số dư về 0đ, mất mọi nâng cấp quán cơm và thành tựu đã đạt. Tiếp tục?')) {
+            Wallet.resetBalance();
+            RestaurantSaveResetIfAvailable();
+            Achievements.resetAll();
+            refreshDisplay();
+            refreshLocks();
+            renderAchievements();
+        }
+    });
+
+    // restaurant-save.js isn't loaded on this page (only the restaurant
+    // needs it), so reset that key directly instead of pulling in the file.
+    function RestaurantSaveResetIfAvailable() {
+        try { localStorage.removeItem('hoangGiaClub_restaurant_upgrades_v1'); } catch (e) {}
+    }
+
+    window.addEventListener('wallet:changed', refreshDisplay);
+    window.addEventListener('achievement:unlocked', () => { refreshLocks(); renderAchievements(); });
+    window.addEventListener('achievement:reset', () => { refreshLocks(); renderAchievements(); });
+
+    refreshDisplay();
+    refreshLocks();
+    renderAchievements();
+</script>
+</body>
+</html>

@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đũa sắt hoàng gia — Xóa đói giảm nghèo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            background: radial-gradient(circle, #3a2802, #1a1000, #000000);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .home-link {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            background: rgba(0,0,0,0.45);
+            color: #ffe066;
+            padding: 6px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid #f1c40f;
+            z-index: 50;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px 12px 40px;
+        }
+
+        .screen.active { display: flex; }
+
+        #start-screen {
+            background: rgba(15, 10, 0, 0.9);
+            text-align: center;
+        }
+
+        h1.title {
+            font-size: clamp(2.4rem, 7vw, 4.5rem);
+            background: linear-gradient(135deg, #ffe066, #f39c12, #f1c40f, #ffffff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+            font-weight: 900;
+        }
+
+        .subtitle {
+            font-size: 1.05rem;
+            color: #f39c12;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+
+        .wallet-preview {
+            color: #ffe066;
+            font-weight: 800;
+            margin-bottom: 28px;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #f39c12, #ffe066, #d35400, #f1c40f);
+            color: #1a0f00;
+            font-weight: 800;
+            font-size: 1.2rem;
+            padding: 14px 42px;
+            border: 2px solid #fff;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(241, 196, 15, 0.6);
+            text-transform: uppercase;
+        }
+
+        .btn-gold:hover { transform: scale(1.05); }
+
+        #poker-table {
+            position: relative;
+            width: 100%;
+            max-width: 1100px;
+            min-height: 620px;
+            background: radial-gradient(ellipse at center, #664d03 0%, #291a00 80%, #120b00 100%);
+            border: 16px solid #b37d14;
+            border-radius: 200px;
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.9), 0 20px 50px rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 20px 18px;
+        }
+
+        .stage-badge {
+            position: absolute;
+            top: 18px;
+            background: rgba(20, 13, 0, 0.85);
+            border: 1px solid #f1c40f;
+            padding: 6px 24px;
+            border-radius: 20px;
+            color: #ffe066;
+            font-size: 0.9rem;
+            letter-spacing: 1.5px;
+            font-weight: bold;
+            z-index: 3;
+        }
+
+        .player-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .avatar-box {
+            background: rgba(25, 16, 0, 0.8);
+            border: 2px solid #f1c40f;
+            padding: 8px 24px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 190px;
+        }
+
+        .player-name { font-weight: bold; font-size: 1.1rem; }
+        .player-chips { color: #ffe066; font-weight: bold; font-size: 1.05rem; }
+
+        .cards-container {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            min-height: 90px;
+        }
+
+        .card {
+            width: 60px;
+            height: 85px;
+            background: #fff;
+            border-radius: 6px;
+            color: #111;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 5px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+            user-select: none;
+        }
+
+        .card.red { color: #d63031; }
+        .card.black { color: #2d3436; }
+        .card.back {
+            background: linear-gradient(135deg, #b37d14, #4a3200, #1a1000);
+            border: 2px solid #ffe066;
+        }
+
+        .community-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pot-box {
+            background: rgba(20, 13, 0, 0.85);
+            border: 2px solid #f1c40f;
+            padding: 6px 25px;
+            border-radius: 20px;
+            color: #ffe066;
+            font-size: 1.15rem;
+            font-weight: bold;
+        }
+
+        .limit-note {
+            font-size: 0.78rem;
+            color: rgba(255, 224, 102, 0.75);
+        }
+
+        .status-msg {
+            font-size: 1rem;
+            color: #ffe066;
+            min-height: 24px;
+            font-weight: bold;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        .rail {
+            width: 100%;
+            max-width: 1100px;
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            background: rgba(18, 11, 0, 0.85);
+            padding: 10px 18px;
+            border-radius: 30px;
+            border: 1.5px solid #f1c40f;
+        }
+
+        .btn-action {
+            background: #2b1d03;
+            color: #ffe066;
+            border: 1px solid #b37d14;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background: #f1c40f;
+            color: #1a0f00;
+        }
+
+        .btn-action:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        .chip-tray {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .chip {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            border: 2px dashed #fff;
+            font-weight: 800;
+            font-size: 11px;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .chip:hover:not(:disabled) { transform: translateY(-3px); }
+        .chip:disabled { opacity: 0.35; cursor: not-allowed; }
+        .chip-10k { background: #3b4b57; }
+        .chip-50k { background: #10513d; border-color: #f1c40f; }
+        .chip-200k { background: #5c1f2b; }
+        .chip-1m { background: #241b3a; border-color: #f1c40f; }
+
+        .clear-bet {
+            background: none;
+            border: 1px solid rgba(255,224,102,0.5);
+            color: #ffe066;
+            border-radius: 999px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .raise-readout {
+            color: #ffe066;
+            font-weight: 800;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        /* Yu-Gi-Oh Master Duel style street banner */
+        #phase-banner {
+            position: fixed;
+            inset: 0;
+            z-index: 80;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            background: linear-gradient(
+                90deg,
+                rgba(0,0,0,0) 0%,
+                rgba(8, 5, 0, 0.82) 22%,
+                rgba(8, 5, 0, 0.88) 50%,
+                rgba(8, 5, 0, 0.82) 78%,
+                rgba(0,0,0,0) 100%
+            );
+        }
+
+        #phase-banner.show { display: flex; }
+
+        .phase-banner-inner {
+            text-align: center;
+            animation: phaseSweep 0.55s ease-out;
+        }
+
+        #phase-banner h2 {
+            font-size: clamp(2.4rem, 8vw, 4.6rem);
+            letter-spacing: 0.22em;
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            text-shadow:
+                0 0 18px rgba(255, 224, 102, 0.95),
+                0 0 40px rgba(241, 196, 15, 0.7),
+                0 4px 0 #3a2802;
+            line-height: 1.05;
+        }
+
+        #phase-banner p {
+            margin-top: 10px;
+            color: #ffe066;
+            letter-spacing: 0.28em;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        @keyframes phaseSweep {
+            from { transform: scale(0.72) translateY(12px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 720px) {
+            #poker-table { border-radius: 40px; border-width: 10px; min-height: 540px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background music. loop keeps it playing round after round. -->
+    <audio id="bg-music" src="bgmcard.mp3" loop preload="auto"></audio>
+    <a class="home-link" href="index.html">&larr; Trang chủ</a>
+
+    <div id="start-screen" class="screen active">
+        <h1 class="title">Đũa sắt hoàng gia</h1>
+        <div class="subtitle">Heads-up Texas Hold'em — một dealer, ví VNĐ chung với sảnh chính</div>
+        <div class="wallet-preview">Số dư: <span id="start-balance">0đ</span></div>
+        <button class="btn-gold" onclick="enterTable()">Vào bàn</button>
+    </div>
+
+    <div id="game-screen" class="screen">
+        <div id="poker-table">
+            <div class="stage-badge" id="stage-info">PRE-FLOP</div>
+
+            <div class="player-area">
+                <div class="avatar-box">
+                    <div class="player-name" id="bot-name">Dealer</div>
+                    <div class="player-chips" id="bot-chips">0đ</div>
+                </div>
+                <div class="cards-container" id="bot-cards"></div>
+            </div>
+
+            <div class="community-area">
+                <div class="pot-box" id="pot-display">POT: 0đ</div>
+                <div class="limit-note" id="limit-note">Giới hạn mỗi vòng: 1.000.000đ</div>
+                <div class="cards-container" id="community-cards"></div>
+                <div class="status-msg" id="status-text">Nhấn Chia bài để bắt đầu.</div>
+            </div>
+
+            <div class="player-area">
+                <div class="cards-container" id="player-cards"></div>
+                <div class="avatar-box">
+                    <div class="player-name">Bạn</div>
+                    <div class="player-chips" id="player-chips">0đ</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rail">
+            <div class="chip-tray" id="chip-tray">
+                <button class="chip chip-10k" data-value="10000">10K</button>
+                <button class="chip chip-50k" data-value="50000">50K</button>
+                <button class="chip chip-200k" data-value="200000">200K</button>
+                <button class="chip chip-1m" data-value="1000000">1M</button>
+                <button class="clear-bet" id="clear-bet" type="button">Xóa chip</button>
+                <div class="raise-readout" id="raise-val">Cược chip: 0đ</div>
+            </div>
+
+            <div class="controls">
+                <button class="btn-action" id="btn-fold" onclick="playerAction('fold')">Úp bài (Fold)</button>
+                <button class="btn-action" id="btn-check" onclick="playerAction('check')">Xem bài (Check)</button>
+                <button class="btn-action" id="btn-call" onclick="playerAction('call')">Theo (Call)</button>
+                <button class="btn-action" id="btn-raise" onclick="playerAction('raise')">Tăng cược</button>
+                <button class="btn-action" id="btn-deal" style="background: linear-gradient(135deg, #f1c40f, #f39c12); color: #1a0f00;" onclick="startNewHand()">Chia bài</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="phase-banner" aria-live="polite">
+        <div class="phase-banner-inner">
+            <h2 id="phase-banner-title">MAIN PHASE</h2>
+            <p id="phase-banner-sub">Texas Hold'em</p>
+        </div>
+    </div>
+
+    <script src="achievements.js"></script>
+    <script src="wallet.js"></script>
+    <script>
+    const bgMusic = document.getElementById('bg-music');
+
+    function startMusic() {
+        bgMusic.play()
+            .then(() => {
+                console.log('Nhạc đã được phát');
+            })
+            .catch(error => {
+                console.error('Không thể phát nhạc:', error);
+            });
+
+        document.removeEventListener('click', startMusic);
+    }
+
+    document.addEventListener('click', startMusic);
+        if (!Achievements.isUnlocked('millionaire')) {
+            alert('Bạn cần đạt số dư 1.000.000đ để mở khóa Đũa sắt hoàng gia! Hãy kiếm tiền ở Quán Cơm hoặc Vượt qua điểm mười trước.');
+            window.location.replace('index.html');
+        } else {
+            Achievements.unlock('lets_go_gambling');
+        }
+
+        const SMALL_BLIND = 10000;
+        const BIG_BLIND = 20000;
+        const PHASE_LIMIT = 1000000;
+        const DEALER_NAME = 'Dealer';
+        const HOUSE_STACK = 2000000;
+
+        const PHASE_COPY = {
+            PREFLOP: { title: 'PRE-FLOP', sub: 'Hai lá bài riêng · Blind đã vào pot' },
+            FLOP: { title: 'FLOP', sub: 'Ba lá bài chung được mở' },
+            TURN: { title: 'TURN', sub: 'Lá bài chung thứ tư' },
+            RIVER: { title: 'RIVER', sub: 'Lá bài chung cuối cùng' },
+            SHOWDOWN: { title: 'SHOWDOWN', sub: 'Lật bài · So sánh tay bài' }
+        };
+
+        let playerChips = 0;
+        let botChips = HOUSE_STACK;
+        let pot = 0;
+        let currentBet = 0;
+        let playerCurrentBet = 0;
+        let botCurrentBet = 0;
+        let chipBet = 0;
+
+        let deck = [];
+        let playerCards = [];
+        let botCards = [];
+        let communityCards = [];
+        let gamePhase = 'IDLE';
+        let actingLocked = false;
+
+        const suits = ['♠', '♥', '♦', '♣'];
+        const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+        function formatVnd(n) {
+            return Wallet.formatVnd(n);
+        }
+
+        function syncWallet() {
+            Wallet.setBalance(playerChips);
+        }
+
+        function enterTable() {
+            playerChips = Wallet.getBalance();
+            if (playerChips < BIG_BLIND) {
+                alert('Số dư ví không đủ small/big blind (cần ít nhất 20.000đ).');
+                return;
+            }
+            botChips = HOUSE_STACK;
+            document.getElementById('start-screen').classList.remove('active');
+            document.getElementById('game-screen').classList.add('active');
+            updateUI();
+            setControls(false);
+        }
+
+        function createDeck() {
+            deck = [];
+            for (const s of suits) {
+                for (const v of values) {
+                    deck.push({ suit: s, value: v, isRed: s === '♥' || s === '♦' });
+                }
+            }
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        function startNewHand() {
+            playerChips = Wallet.getBalance();
+            if (playerChips < SMALL_BLIND) {
+                alert('Bạn đã hết tiền trong ví chung. Quay lại quán cơm để kiếm thêm VNĐ.');
+                window.location.href = 'index.html';
+                return;
+            }
+            if (botChips < BIG_BLIND) botChips = HOUSE_STACK;
+
+            pot = 0;
+            playerCurrentBet = 0;
+            botCurrentBet = 0;
+            currentBet = 0;
+            chipBet = 0;
+            communityCards = [];
+            createDeck();
+            playerCards = [deck.pop(), deck.pop()];
+            botCards = [deck.pop(), deck.pop()];
+
+            const sb = Math.min(SMALL_BLIND, playerChips);
+            const bb = Math.min(BIG_BLIND, botChips);
+            playerChips -= sb;
+            playerCurrentBet = sb;
+            botChips -= bb;
+            botCurrentBet = bb;
+            pot = sb + bb;
+            currentBet = Math.max(sb, bb);
+            syncWallet();
+
+            gamePhase = 'PREFLOP';
+            renderCards();
+            updateUI();
+            document.getElementById('btn-deal').disabled = true;
+            setControls(false);
+            announcePhase('PREFLOP', function () {
+                setControls(true);
+                setStatus('Ván bắt đầu. Bạn đã đặt Small Blind ' + formatVnd(sb) + '.');
+            });
+        }
+
+        function announcePhase(phase, after) {
+            const copy = PHASE_COPY[phase] || { title: phase, sub: '' };
+            const banner = document.getElementById('phase-banner');
+            document.getElementById('phase-banner-title').textContent = copy.title;
+            document.getElementById('phase-banner-sub').textContent = copy.sub;
+            document.getElementById('stage-info').textContent = copy.title;
+            banner.classList.add('show');
+            setTimeout(function () {
+                banner.classList.remove('show');
+                if (after) after();
+            }, 1600);
+        }
+
+        function cardHtml(c) {
+            return '<div class="card ' + (c.isRed ? 'red' : 'black') + '">' +
+                '<div>' + c.value + '</div>' +
+                '<div style="text-align:center;">' + c.suit + '</div>' +
+                '<div style="text-align:right;">' + c.value + '</div>' +
+                '</div>';
+        }
+
+        function renderCards() {
+            document.getElementById('player-cards').innerHTML = playerCards.map(cardHtml).join('');
+            const bBox = document.getElementById('bot-cards');
+            if (gamePhase === 'SHOWDOWN') {
+                bBox.innerHTML = botCards.map(cardHtml).join('');
+            } else if (gamePhase === 'IDLE') {
+                bBox.innerHTML = '';
+            } else {
+                bBox.innerHTML = '<div class="card back"></div><div class="card back"></div>';
+            }
+            document.getElementById('community-cards').innerHTML = communityCards.map(cardHtml).join('');
+        }
+
+        function remainingPhaseRoom(alreadyIn) {
+            return Math.max(0, PHASE_LIMIT - alreadyIn);
+        }
+
+        function updateUI() {
+            document.getElementById('player-chips').innerText = formatVnd(playerChips);
+            document.getElementById('bot-chips').innerText = formatVnd(botChips);
+            document.getElementById('pot-display').innerText = 'POT: ' + formatVnd(pot);
+            document.getElementById('bot-name').innerText = DEALER_NAME;
+            const copy = PHASE_COPY[gamePhase];
+            if (copy) document.getElementById('stage-info').innerText = copy.title;
+            document.getElementById('limit-note').innerText =
+                'Giới hạn mỗi vòng: ' + formatVnd(PHASE_LIMIT) +
+                ' · Đã cược vòng này: ' + formatVnd(playerCurrentBet);
+            document.getElementById('raise-val').innerText = 'Cược chip: ' + formatVnd(chipBet);
+            refreshChips();
+        }
+
+        function maxChipAdd() {
+            return Math.max(0, Math.min(playerChips, remainingPhaseRoom(playerCurrentBet)));
+        }
+
+        function refreshChips() {
+            const canBet = gamePhase !== 'IDLE' && gamePhase !== 'SHOWDOWN' && !actingLocked;
+            const maxAdd = Math.max(0, maxChipAdd());
+            document.querySelectorAll('.chip').forEach(function (chip) {
+                const value = parseInt(chip.dataset.value, 10);
+                chip.disabled = !canBet || value > maxAdd || chipBet + value > maxAdd;
+            });
+            document.getElementById('clear-bet').disabled = !canBet || chipBet === 0;
+        }
+
+        function updateRaiseVal() {
+            document.getElementById('raise-val').innerText = 'Cược chip: ' + formatVnd(chipBet);
+        }
+
+        function setControls(enable) {
+            actingLocked = !enable;
+            const needCall = currentBet > playerCurrentBet;
+            document.getElementById('btn-fold').disabled = !enable;
+            document.getElementById('btn-check').disabled = !enable || needCall;
+            document.getElementById('btn-call').disabled = !enable || !needCall;
+            const minRaiseTo = currentBet === 0 ? BIG_BLIND : currentBet * 2;
+            const raiseTarget = playerCurrentBet + chipBet;
+            const room = remainingPhaseRoom(playerCurrentBet);
+            document.getElementById('btn-raise').disabled =
+                !enable || chipBet <= 0 || raiseTarget > playerCurrentBet + room || raiseTarget < minRaiseTo;
+            refreshChips();
+        }
+
+        function setStatus(msg) {
+            document.getElementById('status-text').innerText = msg;
+        }
+
+        function playerAction(action) {
+            if (actingLocked) return;
+            if (action === 'fold') {
+                setStatus('Bạn đã úp bài. Dealer thắng pot!');
+                botChips += pot;
+                endHand();
+                return;
+            }
+
+            if (action === 'check') {
+                setStatus('Bạn chọn xem bài (Check).');
+            } else if (action === 'call') {
+                let callAmt = Math.min(currentBet - playerCurrentBet, playerChips, remainingPhaseRoom(playerCurrentBet));
+                playerChips -= callAmt;
+                playerCurrentBet += callAmt;
+                pot += callAmt;
+                syncWallet();
+                setStatus('Bạn đã theo ' + formatVnd(callAmt) + '.');
+            } else if (action === 'raise') {
+                const addedAmt = chipBet;
+                const minRaiseTo = currentBet === 0 ? BIG_BLIND : currentBet * 2;
+                const newTotal = playerCurrentBet + addedAmt;
+                if (addedAmt <= 0 || newTotal < minRaiseTo) {
+                    setStatus('Chọn chip để tăng cược (tối thiểu ' + formatVnd(minRaiseTo) + ' trong vòng này).');
+                    return;
+                }
+                if (addedAmt > remainingPhaseRoom(playerCurrentBet) || addedAmt > playerChips) {
+                    setStatus('Vượt giới hạn 1.000.000đ mỗi vòng hoặc vượt số dư ví.');
+                    return;
+                }
+                playerChips -= addedAmt;
+                playerCurrentBet = newTotal;
+                currentBet = newTotal;
+                pot += addedAmt;
+                chipBet = 0;
+                syncWallet();
+                setStatus('Bạn tăng cược lên ' + formatVnd(newTotal) + '!');
+            }
+
+            updateUI();
+            setControls(false);
+            setTimeout(botTurn, 900);
+        }
+
+        function botTurn() {
+            const callDiff = currentBet - botCurrentBet;
+            const handPower = getSimpleHandPower(botCards, communityCards);
+            const room = remainingPhaseRoom(botCurrentBet);
+            let action = 'check';
+
+            if (callDiff === 0) {
+                action = handPower >= 4 && room >= BIG_BLIND ? 'raise' : 'check';
+            } else if (callDiff > room) {
+                action = handPower >= 5 ? 'call' : 'fold';
+            } else if (callDiff > 400000 && handPower <= 1) {
+                action = Math.random() < 0.55 ? 'fold' : 'call';
+            } else if (handPower >= 4 && room > callDiff + BIG_BLIND) {
+                action = 'raise';
+            } else {
+                action = 'call';
+            }
+
+            if (action === 'fold') {
+                setStatus('Dealer đã úp bài. Bạn thắng pot!');
+                playerChips += pot;
+                syncWallet();
+                endHand();
+                return;
+            }
+
+            if (action === 'check') {
+                setStatus('Dealer chọn xem bài (Check).');
+                advancePhase();
+            } else if (action === 'call') {
+                const amt = Math.min(callDiff, botChips, room);
+                botChips -= amt;
+                botCurrentBet += amt;
+                pot += amt;
+                setStatus('Dealer đã theo ' + formatVnd(amt) + '.');
+                advancePhase();
+            } else if (action === 'raise') {
+                const bump = Math.min(BIG_BLIND * 5, room - callDiff, botChips - callDiff);
+                let raiseVal = botCurrentBet + callDiff + Math.max(bump, BIG_BLIND);
+                raiseVal = Math.min(raiseVal, botCurrentBet + room, botChips + botCurrentBet, PHASE_LIMIT);
+                const addAmt = raiseVal - botCurrentBet;
+                if (addAmt <= callDiff) {
+                    const amt = Math.min(callDiff, botChips, room);
+                    botChips -= amt;
+                    botCurrentBet += amt;
+                    pot += amt;
+                    setStatus('Dealer đã theo ' + formatVnd(amt) + '.');
+                    advancePhase();
+                } else {
+                    botChips -= addAmt;
+                    botCurrentBet = raiseVal;
+                    currentBet = raiseVal;
+                    pot += addAmt;
+                    setStatus('Dealer đã tăng cược lên ' + formatVnd(raiseVal) + '!');
+                    chipBet = 0;
+                    updateUI();
+                    setControls(true);
+                    return;
+                }
+            }
+
+            updateUI();
+        }
+
+        function advancePhase() {
+            playerCurrentBet = 0;
+            botCurrentBet = 0;
+            currentBet = 0;
+            chipBet = 0;
+
+            const next = {
+                PREFLOP: 'FLOP',
+                FLOP: 'TURN',
+                TURN: 'RIVER',
+                RIVER: 'SHOWDOWN'
+            }[gamePhase];
+
+            if (!next) return;
+
+            if (next === 'FLOP') {
+                communityCards.push(deck.pop(), deck.pop(), deck.pop());
+            } else if (next === 'TURN' || next === 'RIVER') {
+                communityCards.push(deck.pop());
+            }
+
+            gamePhase = next;
+            renderCards();
+            updateUI();
+            setControls(false);
+
+            announcePhase(next, function () {
+                if (next === 'SHOWDOWN') {
+                    determineWinner();
+                } else {
+                    setControls(true);
+                    setStatus('Vòng ' + PHASE_COPY[next].title + ' — giới hạn cược ' + formatVnd(PHASE_LIMIT) + '.');
+                }
+            });
+        }
+
+        function determineWinner() {
+            const pPower = getSimpleHandPower(playerCards, communityCards);
+            const bPower = getSimpleHandPower(botCards, communityCards);
+
+            if (pPower > bPower) {
+                setStatus('Bạn thắng ván này!');
+                playerChips += pot;
+            } else if (bPower > pPower) {
+                setStatus('Dealer thắng ván này!');
+                botChips += pot;
+            } else {
+                setStatus('Hòa — chia đôi pot.');
+                const playerShare = Wallet.roundReward(pot / 2);
+                playerChips += playerShare;
+                botChips += pot - playerShare;
+            }
+            syncWallet();
+            endHand();
+        }
+
+        function endHand() {
+            gamePhase = 'IDLE';
+            chipBet = 0;
+            syncWallet();
+            updateUI();
+            document.getElementById('btn-deal').disabled = false;
+            setControls(false);
+            document.getElementById('stage-info').innerText = 'CHỜ VÁN MỚI';
+        }
+
+        function getSimpleHandPower(hand, comm) {
+            const all = hand.concat(comm);
+            const vMap = {};
+            all.forEach(function (c) { vMap[c.value] = (vMap[c.value] || 0) + 1; });
+            const counts = Object.keys(vMap).map(function (k) { return vMap[k]; });
+            if (counts.indexOf(4) !== -1) return 8;
+            if (counts.indexOf(3) !== -1 && counts.indexOf(2) !== -1) return 7;
+            if (counts.indexOf(3) !== -1) return 4;
+            if (counts.filter(function (x) { return x === 2; }).length >= 2) return 3;
+            if (counts.indexOf(2) !== -1) return 2;
+            return 1;
+        }
+
+        document.getElementById('chip-tray').addEventListener('click', function (e) {
+            const chip = e.target.closest('.chip');
+            if (chip) {
+                if (chip.disabled) return;
+                const value = parseInt(chip.dataset.value, 10);
+                const maxAdd = maxChipAdd();
+                if (chipBet + value > maxAdd) return;
+                chipBet += value;
+                updateRaiseVal();
+                setControls(true);
+                return;
+            }
+            if (e.target.id === 'clear-bet') {
+                chipBet = 0;
+                updateRaiseVal();
+                setControls(gamePhase !== 'IDLE' && gamePhase !== 'SHOWDOWN');
+            }
+        });
+
+        document.getElementById('start-balance').textContent = formatVnd(Wallet.getBalance());
+        window.addEventListener('wallet:changed', function () {
+            if (gamePhase === 'IDLE') {
+                playerChips = Wallet.getBalance();
+                document.getElementById('start-balance').textContent = formatVnd(playerChips);
+                if (document.getElementById('game-screen').classList.contains('active')) updateUI();
+            }
+        });
+    </script>
+</body>
+</html>

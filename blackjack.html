@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bàn thợ đụng — Xóa đói giảm nghèo</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="marquee">
+    <a href="index.html" style="position:absolute;top:20px;left:16px;background:rgba(0,0,0,0.35);color:#f5f1e6;padding:6px 12px;border-radius:8px;text-decoration:none;font-size:13px;border:1px solid #c9a227;">&larr; Trang chủ</a>
+    <button class="music-toggle" id="music-toggle" aria-label="Toggle background music">
+      &#9835; Music
+    </button>
+    <h1>Bàn thợ đụng — Xóa đói giảm nghèo</h1>
+    <p class="tagline">Blackjack pays 3 to 2 · Dealer stands on 17 · Table limit 10.000đ–1.000.000đ</p>
+  </header>
+
+  <!-- Background music. loop keeps it playing round after round. -->
+  <audio id="bg-music" src="backgroundmusic.mp3" loop preload="auto"></audio>
+
+  <main class="table">
+
+    <!-- Dealer's row -->
+    <section class="row dealer-row">
+      <div class="row-label">
+        <span class="suit">&#9824;</span> Dealer
+        <span class="hand-total" id="dealer-total">—</span>
+      </div>
+      <div class="cards" id="dealer-cards"></div>
+    </section>
+
+    <!-- Center strip: shoe count + status message -->
+    <section class="center-strip">
+      <p class="message" id="message">Place a bet (10.000đ–1.000.000đ) to begin.</p>
+      <p class="shoe-count" id="shoe-count"></p>
+    </section>
+
+    <!-- Player's row -->
+    <section class="row player-row">
+      <div class="cards" id="player-cards"></div>
+      <div class="row-label">
+        <span class="suit">&#9827;</span> You
+        <span class="hand-total" id="player-total">—</span>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="rail">
+
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-label">Cash</span>
+        <span class="stat-value" id="cash-value">10.000.000đ</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Bet</span>
+        <span class="stat-value" id="bet-value">0đ</span>
+      </div>
+    </div>
+
+    <div class="chip-tray" id="chip-tray">
+      <button class="chip chip-5"   data-value="10000">10.000đ</button>
+      <button class="chip chip-25"  data-value="50000">50.000đ</button>
+      <button class="chip chip-100" data-value="200000">200.000đ</button>
+      <button class="chip chip-500" data-value="1000000">1.000.000đ</button>
+      <button class="clear-bet" id="clear-bet">Clear bet</button>
+    </div>
+
+    <div class="actions" id="actions">
+      <button class="btn btn-deal" id="deal-btn">Deal</button>
+      <button class="btn btn-hit" id="hit-btn" disabled>Hit</button>
+      <button class="btn btn-stand" id="stand-btn" disabled>Stand</button>
+      <button class="btn btn-double" id="double-btn" disabled>Double down</button>
+    </div>
+
+  </footer>
+
+  <div class="reset-overlay" id="reset-overlay">
+    <div class="reset-card">
+      <h2>Table closed</h2>
+      <p>You're out of cash. Every table has a comeback story.</p>
+      <button class="btn btn-deal" id="reset-btn">Buy back in</button>
+    </div>
+  </div>
+
+  <script src="achievements.js"></script>
+  <script src="wallet.js"></script>
+  <script>
+    // Access gate: Blackjack unlocks once "Who Wants To Be A Millionaire"
+    // (reach 1.000.000đ) has been achieved.
+    if (!Achievements.isUnlocked('millionaire')) {
+      alert('Bạn cần đạt số dư 1.000.000đ để mở khóa Thợ đụng! Hãy kiếm tiền ở Quán Cơm hoặc Tài Xỉu trước.');
+      window.location.replace('index.html');
+    } else {
+      Achievements.unlock('lets_go_gambling');
+    }
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
